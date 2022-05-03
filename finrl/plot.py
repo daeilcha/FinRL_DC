@@ -47,13 +47,19 @@ def backtest_plot(
         baseline_end=config.TRADE_END_DATE,
         baseline_ticker="^DJI",
         value_col_name="account_value",
+        custom=False, # DC: for custom benchmark
+        df_=None, # DC: if custom, enter a df of its dates/prices with columns: date, close, tic
 ):
+    '''
+    for custom benchmarks, enter a dataframe with columns: date, close, tic 
+    (only date and close are needed for bactest_stats() and backtest_plot())
+    '''
     df = deepcopy(account_value)
     df["date"] = pd.to_datetime(df["date"])
     test_returns = get_daily_return(df, value_col_name=value_col_name)
 
     baseline_df = get_baseline(
-        ticker=baseline_ticker, start=baseline_start, end=baseline_end
+        ticker=baseline_ticker, start=baseline_start, end=baseline_end, custom, df_,
     )
 
     baseline_df["date"] = pd.to_datetime(baseline_df["date"], format="%Y-%m-%d")
@@ -67,10 +73,21 @@ def backtest_plot(
         )
 
 
-def get_baseline(ticker, start, end):
-    return YahooDownloader(
-        start_date=start, end_date=end, ticker_list=[ticker]
-    ).fetch_data()
+def get_baseline(
+    ticker, start, end, custom=False, df_=None, # DC: for custom benchmark, enter a df of its dates/prices with columns: date, close, tic
+    ):
+    '''
+    YahooDownloader().fetch_data() returns a dataframe of 7 columns: A date, open, high, 
+    low, close, volume and tick symbol for the specified stock ticker
+    But only the date and close columns are needed for the backtestplot() function above
+    '''
+    if custom==False:
+        return YahooDownloader(
+            start_date=start, end_date=end, ticker_list=[ticker]
+        ).fetch_data()
+    else:
+        return df_
+
 
 
 def trx_plot(df_trade, df_actions, ticker_list):
