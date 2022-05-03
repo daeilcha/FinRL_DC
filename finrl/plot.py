@@ -59,7 +59,7 @@ def backtest_plot(
     test_returns = get_daily_return(df, value_col_name=value_col_name)
 
     baseline_df = get_baseline(
-        ticker=baseline_ticker, start=baseline_start, end=baseline_end, custom, df_,
+        ticker=baseline_ticker, start=baseline_start, end=baseline_end, custom=custom, df_=df_,
     )
 
     baseline_df["date"] = pd.to_datetime(baseline_df["date"], format="%Y-%m-%d")
